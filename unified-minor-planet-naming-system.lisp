@@ -2,7 +2,8 @@
 
 (defpackage :info.isoraqathedh.umpns
   (:use :cl)
-  (:nicknames :umpns))
+  (:nicknames :umnps ; <= Common Typo
+   :umpns))
 (in-package :umpns)
 
 (defun packed-form-p (string)
