@@ -8,15 +8,7 @@
 
 (defun packed-form-p (string)
   "Checks if a string is a packed form or not."
-  ;; Change to regex when convenient
-  (and (= 7 (length string))
-       (find (char string 0) "IJK")
-       (digit-char-p (char string 1))
-       (digit-char-p (char string 2))
-       (find (char string 3) "ABCDEFGHJKLMNOPQRSTUVWXY")
-       (alphanumericp (char string 4))
-       (digit-char-p (char string 5))
-       (find (char string 6) "ABCDEFGHJKLMNOPQRSTUVWXYZ")))
+  (cl-ppcre:scan "^[IJK][0-9][0-9][A-HJ-Y][A-Za-z0-9][0-9][A-HJ-Z]$" string))
 
 (defun packed-form-year (packed-form)
   "Retrieves the year of discovery from the packed form."
