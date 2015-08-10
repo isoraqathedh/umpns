@@ -20,7 +20,7 @@
 
 (defun packed-form-half-month (packed-form)
   "Retrieves the half-month of discovery from the packed form."
-  (char packed-form 3))
+  (position (char packed-form 3) "ABCDEFGHJKLMNOPQRSTUVWXY"))
 
 (defun packed-form-serial-number (packed-form)
   "Retrieves the serial number of discovery from the packed form."
