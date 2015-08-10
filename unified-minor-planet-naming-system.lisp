@@ -3,7 +3,7 @@
 (defpackage :info.isoraqathedh.umpns
   (:use :cl)
   (:nicknames :umpns))
-(in-package :umnps)
+(in-package :umpns)
 
 (defun packed-form-p (string)
   "Checks if a string is a packed form or not."
