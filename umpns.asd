@@ -8,6 +8,4 @@
   :license "MIT"
   :components ((:file "unified-minor-planet-naming-system")
                (:module "sub-directory"
-                :components (:file "subdir-lisp-source-file")))
-  :depends-on (:dependency-a
-               :dependency-b))
+                :components (:file "subdir-lisp-source-file"))))
