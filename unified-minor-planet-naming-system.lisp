@@ -46,9 +46,9 @@
 half-month of discovery and serial number."
   (list :discovery-half-month
         (let ((half-month (packed-form-half-month packed-form)))
-          (encode-universal-time
-           0 0 0 ; These values are irrelevant
-           (if (evenp half-month) 1 15)
+          (encode-timestamp
+           0 0 0 0 ; These values are irrelevant
+           (if (evenp half-month) 1 16)
            (1+ (floor (/ half-month 2)))
            (packed-form-year packed-form)))
         :serial-number (packed-form-serial-number packed-form)))
