@@ -7,7 +7,9 @@
 (in-package :umpns)
 
 ;; Connect to the database
-(defvar *db* (connect (uiop:native-namestring (asdf:system-relative-pathname :umpns "mpcorb.db"))))
+(defvar *db* (connect
+              (uiop:native-namestring
+               (asdf:system-relative-pathname :umpns "mpcorb.db"))))
 
 ;; Some parsing stuff
 (defun packed-form-p (string)
