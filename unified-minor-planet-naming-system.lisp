@@ -52,3 +52,29 @@ half-month of discovery and serial number."
            (1+ (floor (/ half-month 2)))
            (packed-form-year packed-form)))
         :serial-number (packed-form-serial-number packed-form)))
+
+(defun line-get-eccentricity (line)    (read-from-string (subseq line 71 80)))
+(defun line-get-semi-major-axis (line) (read-from-string (subseq line 93 104)))
+(defun line-get-inclination (line)     (read-from-string (subseq line 60 69)))
+
+(defun aliases-line-number (alias-line)
+  (+ (* 10000 (position (char alias-line 0) "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
+     (parse-integer alias-line :start 1 :end 5)))
+
+(defun aliases-line-alias (alias-line)
+  (let ((packed-form-list-start 6) (packed-form-length 7))
+    (iter
+     (for caret-position
+          from (+ packed-form-list-start packed-form-length)
+          to (length alias-line)
+          by packed-from-length)
+     (for fragment = (subseq alias-line (- caret-position packed-form-length) caret-position))
+     (when (packed-form-p fragment)
+       (collect (parse-packed-form fragment))))))
+
+(defun parse-alias-line (alias-line)
+  (cons (aliases-line-number alias-line) (aliases-line-alias alias-line)))
+
+(defun perihelion (semi-major-axis eccentricity)
+  (* semi-major-axis (- 1 eccentricity)))
+
