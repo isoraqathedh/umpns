@@ -70,7 +70,7 @@ half-month of discovery and serial number."
      (for caret-position
           from (+ packed-form-list-start packed-form-length)
           to (length alias-line)
-          by packed-from-length)
+          by packed-form-length)
      (for fragment = (subseq alias-line (- caret-position packed-form-length) caret-position))
      (when (packed-form-p fragment)
        (collect (parse-packed-form fragment))))))
