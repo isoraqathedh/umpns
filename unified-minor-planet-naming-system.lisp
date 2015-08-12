@@ -1,7 +1,7 @@
 ;;;; Conversion from provisional designation to UMPNS
 
 (defpackage :info.isoraqathedh.umpns
-  (:use :cl :iter :sqlite)
+  (:use :cl :iter :sqlite :local-time)
   (:nicknames :umnps ; <= Common Typo
    :umpns))
 (in-package :umpns)
