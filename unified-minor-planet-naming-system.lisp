@@ -84,7 +84,14 @@ half-month of discovery and serial number."
 ;;; Stuff related to dumping into database
 
 (defun exec (query &rest params)
-  (apply #'execute-non-query *db* query params))
+  (etypecase query
+    (string (apply #'sqlite:execute-non-query *db* query params))
+    (sqlite:sqlite-statement
+     (loop for i from 1
+           for param in params
+           do (sqlite:bind-parameter query i param))
+     (sqlite:step-statement query)
+     (sqlite:reset-statement query))))
 
 (defun setup-database ()
   (exec
