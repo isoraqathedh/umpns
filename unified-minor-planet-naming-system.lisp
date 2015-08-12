@@ -83,17 +83,42 @@ half-month of discovery and serial number."
 
 ;;; Stuff related to dumping into database
 
+(defun exec (query &rest params)
+  (apply #'execute-non-query *db* query params))
+
+(defun setup-database ()
+  (exec
+   "CREATE TABLE \"planets\"
+       (\"minor-planet-number\" INTEGER PRIMARY KEY NOT NULL,
+        \"semimajor-axis\" REAL NOT NULL,
+        \"discovery-date\" INTEGER NOT NULL,
+        \"eccentricity\" REAL NOT NULL,
+        \"inclination\" REAL NOT NULL,
+        \"serial-number\" INTEGER NOT NULL,
+        \"new-code\" TEXT)")
+  (exec
+   "CREATE TABLE \"aliases\"
+       (\"year\" INTEGER NOT NULL,
+        \"half-month\" INTEGER NOT NULL,
+        \"number\" INTEGER NOT NULL,
+        \"minor-planet-number\" REFERENCES \"planets\"(\"minor-planet-number\"))")
+  
+  (exec "CREATE UNIQUE INDEX \"aliases-index\" ON \"aliases\"(\"year\", \"half-month\", \"number\")")
+  (exec "CREATE INDEX \"aliases-minor-planet-number\" ON \"aliases\"(\"minor-planet-number\")")
+  (exec "CREATE INDEX \"aliases-year\" ON \"aliases\"(\"year\")")
+  (exec "CREATE INDEX \"aliases-half-month\" ON \"aliases\"(\"year\",\"half-month\")"))
+
 (defun clear-database ()
-  (execute-non-query *db* "delete from aliases")
-  (execute-non-query *db* "delete from planets")
-  (execute-non-query *db* "vacuum"))
+  (exec "DELETE FROM \"aliases\"")
+  (exec "DELETE FROM \"planets\"")
+  (exec "VACUUM"))
 
 (defun insert-alias (alias-line)
   (iter (for (nil discovery-date nil serial-number) in (aliases-line-alias alias-line))
-    (execute-non-query *db* "insert into aliases (year, \"half-month\", number, \"minor-planet-number\") values (?,?,?,?)"
-                       (timestamp-year discovery-date)
-                       (+ (if (= 1 (timestamp-day discovery-date)) 0 1)
-                          (* 2 (timestamp-month discovery-date)))
-                       serial-number
-                       (aliases-line-number alias-line))))
+    (exec "INSERT INTO \"aliases\" (\"year\", \"half-month\", \"number\", \"minor-planet-number\") VALUES (?,?,?,?)"
+          (timestamp-year discovery-date)
+          (+ (if (= 1 (timestamp-day discovery-date)) 0 1)
+             (* 2 (timestamp-month discovery-date)))
+          serial-number
+          (aliases-line-number alias-line))))
 
