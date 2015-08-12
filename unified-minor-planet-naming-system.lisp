@@ -50,7 +50,7 @@ half-month of discovery and serial number."
            0 0 0 0 ; These values are irrelevant
            (if (evenp half-month) 1 16)
            (1+ (floor (/ half-month 2)))
-           (packed-form-year packed-form)))
+           (packed-form-year packed-form)
            :timezone +utc-zone+))
         :serial-number (packed-form-serial-number packed-form)))
 
@@ -78,4 +78,15 @@ half-month of discovery and serial number."
 
 (defun perihelion (semi-major-axis eccentricity)
   (* semi-major-axis (- 1 eccentricity)))
+
+;;; Stuff related to dumping into database
+
+(defun insert-alias (alias-line)
+  (iter (for (nil discovery-date nil serial-number) in (aliases-line-alias alias-line))
+    (execute-non-query *db* "insert into aliases (year, \"half-month\", number, \"minor-planet-number\") values (?,?,?,?)"
+                       (timestamp-year discovery-date)
+                       (+ (if (= 1 (timestamp-day discovery-date)) 0 1)
+                          (* 2 (timestamp-month discovery-date)))
+                       serial-number
+                       (aliases-line-number alias-line))))
 
