@@ -113,12 +113,16 @@ half-month of discovery and serial number."
   (exec "DELETE FROM \"planets\"")
   (exec "VACUUM"))
 
-(defun insert-alias (alias-line)
-  (iter (for (nil discovery-date nil serial-number) in (aliases-line-alias alias-line))
-    (exec "INSERT INTO \"aliases\" (\"year\", \"half-month\", \"number\", \"minor-planet-number\") VALUES (?,?,?,?)"
-          (timestamp-year discovery-date)
-          (+ (if (= 1 (timestamp-day discovery-date)) 0 1)
-             (* 2 (timestamp-month discovery-date)))
-          serial-number
-          (aliases-line-number alias-line))))
+(defun insert-alias (timestamp number minor-planet-number)
+  (exec "INSERT INTO \"aliases\" (\"year\", \"half-month\", \"number\", \"minor-planet-number\") VALUES (?,?,?,?)"
+        (timestamp-year timestamp)
+        (+ (if (= 1 (timestamp-day timestamp)) 0 1)
+           (* 2 (timestamp-month timestamp)))
+        number
+        minor-planet-number))
+
+(defun process-alias-line (alias-line)
+  (let ((line-number (aliases-line-number alias-line)))
+    (iter (for (nil discovery-date nil serial-number) in (aliases-line-alias alias-line))
+      (insert-alias discovery-date serial-number line-number))))
 
