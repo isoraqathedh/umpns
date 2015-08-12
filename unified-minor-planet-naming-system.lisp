@@ -11,6 +11,8 @@
               (uiop:native-namestring
                (asdf:system-relative-pathname :umpns "mpcorb.db"))))
 
+(defvar *aliases-path* (uiop:native-namestring (asdf:system-relative-pathname :umpns "numids.txt")))
+
 ;; Some parsing stuff
 (defun packed-form-p (string)
   "Checks if a string is a packed form or not."
