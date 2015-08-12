@@ -51,6 +51,7 @@ half-month of discovery and serial number."
            (if (evenp half-month) 1 16)
            (1+ (floor (/ half-month 2)))
            (packed-form-year packed-form)))
+           :timezone +utc-zone+))
         :serial-number (packed-form-serial-number packed-form)))
 
 (defun line-get-eccentricity (line)    (read-from-string (subseq line 71 80)))
