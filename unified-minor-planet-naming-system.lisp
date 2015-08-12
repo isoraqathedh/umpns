@@ -83,6 +83,11 @@ half-month of discovery and serial number."
 
 ;;; Stuff related to dumping into database
 
+(defun clear-database ()
+  (execute-non-query *db* "delete from aliases")
+  (execute-non-query *db* "delete from planets")
+  (execute-non-query *db* "vacuum"))
+
 (defun insert-alias (alias-line)
   (iter (for (nil discovery-date nil serial-number) in (aliases-line-alias alias-line))
     (execute-non-query *db* "insert into aliases (year, \"half-month\", number, \"minor-planet-number\") values (?,?,?,?)"
