@@ -7,4 +7,4 @@
   :version "0.1"
   :license "MIT"
   :components ((:file "unified-minor-planet-naming-system"))
-  :depends-on (:cl-ppcre :sqlite :iterate))
+  :depends-on (:cl-ppcre :sqlite :iterate :local-time))
