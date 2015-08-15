@@ -135,3 +135,21 @@ half-month of discovery and serial number."
     (iter (for (nil discovery-date nil serial-number) in (aliases-line-alias alias-line))
       (insert-alias discovery-date serial-number line-number))))
 
+;;; Database + Minor Planet number -> alias
+(defun minor-planet-props (number)
+  (execute-one-row-m-v *db* "SELECT \"year\", \"half-month\", \"number\" FROM \"aliases\" 
+WHERE \"minor-planet-number\" = ? ORDER BY \"year\", \"half-month\" " number))
+
+;;; Minor planet -> database
+(defun insert-planet (minor-planet-number semimajor-axis year half-month eccentricity inclination serial-number vanity-name)
+  (exec "INSERT INTO \"planets\" 
+                   ( \"minor-planet-number\", 
+                     \"semimajor-axis\", 
+                     \"year\",
+                     \"half-month\",
+                     \"eccentricity\", 
+                     \"inclination\", 
+                     \"serial-number\", 
+                     \"vanity-name\") values (?, ?, ?, ?, ?, ?)"
+        minor-planet-number semimajor-axis year half-month eccentricity inclination serial-number vanity-name)) 
+
