@@ -98,10 +98,12 @@ half-month of discovery and serial number."
    "CREATE TABLE \"planets\"
        (\"minor-planet-number\" INTEGER PRIMARY KEY NOT NULL,
         \"semimajor-axis\" REAL NOT NULL,
-        \"discovery-date\" INTEGER NOT NULL,
+        \"year\" INTEGER,
+        \"half-month\" INTEGER,
         \"eccentricity\" REAL NOT NULL,
         \"inclination\" REAL NOT NULL,
-        \"serial-number\" INTEGER NOT NULL,
+        \"serial-number\" INTEGER,
+        \"vanity-name\" TEXT
         \"new-code\" TEXT)")
   (exec
    "CREATE TABLE \"aliases\"
