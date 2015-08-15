@@ -41,7 +41,7 @@
    (* 250 ;; Most significant alphanum
       (position
        (char packed-form 4)
-       "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijlmnopqrstuvwxyz"))))
+       "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))))
 
 (defun parse-packed-form (packed-form)
   "Turns a packed-form string into a list of two things: 
@@ -59,6 +59,7 @@ half-month of discovery and serial number."
 (defun line-get-eccentricity (line)    (read-from-string (subseq line 71 80)))
 (defun line-get-semi-major-axis (line) (read-from-string (subseq line 93 104)))
 (defun line-get-inclination (line)     (read-from-string (subseq line 60 69)))
+(defun line-get-vanity-name (line)     (read-from-string (subseq line )))
 
 (defun aliases-line-number (alias-line)
   (+ (* 10000 (position (char alias-line 0) "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
@@ -122,6 +123,8 @@ half-month of discovery and serial number."
   (exec "DELETE FROM \"planets\"")
   (exec "VACUUM"))
 
+
+;;; Provisional-designation (alias) -> database
 (defun insert-alias (timestamp number minor-planet-number)
   (exec "INSERT INTO \"aliases\" (\"year\", \"half-month\", \"number\", \"minor-planet-number\") VALUES (?,?,?,?)"
         (timestamp-year timestamp)
