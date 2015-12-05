@@ -5,7 +5,13 @@
 
 ;;;
 
-(defvar *aliases-path* (uiop:native-namestring (asdf:system-relative-pathname :umpns "numids.txt")))
+(defvar *aliases-path* (uiop:native-namestring
+                        (asdf:system-relative-pathname :umpns "numids.txt")))
+(defvar *data-path* (uiop:native-namestring
+                     (asdf:system-relative-pathname :umpns "mpcorb-trunc.dat")))
+(defun alphanum->number (char)
+  "Converts the numbering system 0 = 0, 1 = 1, …, A = 10, B = 11, …, Z = 35, …, z = 61."
+  (position char "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
 
 ;;; Some parsing stuff
 (defun packed-form-p (string)
@@ -27,18 +33,16 @@
 (defun packed-form-serial-number (packed-form)
   "Retrieves the serial number of discovery from the packed form."
   (+
-   1 ;; One-based numbering
-   (position (char packed-form 6) "ABCDEFGHJKLMNOPQRSTUVWXYZ")
-   ;; Least significant letter
-   (* 25 (position (char packed-form 5) "0123456789"))
-   ;; Middle significant digit
-   (* 250 ;; Most significant alphanum
-      (position
-       (char packed-form 4)
-       "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))))
+   1                                    ; One-based numbering
+   (position (char packed-form 6)       ; Least significant letter
+             "ABCDEFGHJKLMNOPQRSTUVWXYZ")
+   (* 25                                ; Middle significant digit
+      (position (char packed-form 5) "0123456789"))
+   (* 250                               ; Most significant alphanum
+      (alphanum->number (char packed-form 4)))))
 
 (defun parse-packed-form (packed-form)
-  "Turns a packed-form string into a list of two things: 
+  "Turns a packed-form string into a list of two things:
 half-month of discovery and serial number."
   (list :discovery-half-month
         (let ((half-month (packed-form-half-month packed-form)))
@@ -53,10 +57,10 @@ half-month of discovery and serial number."
 (defun line-get-eccentricity (line)    (read-from-string (subseq line 71 80)))
 (defun line-get-semi-major-axis (line) (read-from-string (subseq line 93 104)))
 (defun line-get-inclination (line)     (read-from-string (subseq line 60 69)))
-(defun line-get-vanity-name (line)     (read-from-string (subseq line )))
+(defun line-get-vanity-name (line)     (read-from-string (subseq line 167 195)))
 
 (defun aliases-line-number (alias-line)
-  (+ (* 10000 (position (char alias-line 0) "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
+  (+ (* 10000 (alphanum->number (char alias-line 0)))
      (parse-integer alias-line :start 1 :end 5)))
 
 (defun aliases-line-alias (alias-line)
@@ -79,7 +83,8 @@ half-month of discovery and serial number."
 
 ;;; Provisional-designation (alias) -> database
 (defun insert-alias (timestamp number minor-planet-number)
-  (exec "INSERT INTO \"aliases\" (\"year\", \"half-month\", \"number\", \"minor-planet-number\") VALUES (?,?,?,?)"
+  (exec "INSERT INTO \"aliases\" (\"year\", \"half-month\", \"number\",
+                                  \"minor-planet-number\") VALUES (?,?,?,?)"
         (timestamp-year timestamp)
         (+ (if (= 1 (timestamp-day timestamp)) 0 1)
            (* 2 (timestamp-month timestamp)))
@@ -88,19 +93,21 @@ half-month of discovery and serial number."
 
 (defun process-alias-line (alias-line)
   (let ((line-number (aliases-line-number alias-line)))
-    (iter (for (nil discovery-date nil serial-number) in (aliases-line-alias alias-line))
+    (iter (for (nil discovery-date nil serial-number)
+               in (aliases-line-alias alias-line))
       (insert-alias discovery-date serial-number line-number))))
 
 ;;; Minor planet -> database
-(defun insert-planet (minor-planet-number semimajor-axis year half-month eccentricity inclination serial-number vanity-name)
-  (exec "INSERT INTO \"planets\" 
-                   ( \"minor-planet-number\", 
-                     \"semimajor-axis\", 
+(defun insert-planet (minor-planet-number semimajor-axis year half-month
+                      eccentricity inclination serial-number vanity-name)
+  (exec "INSERT INTO \"planets\"
+                   ( \"minor-planet-number\",
+                     \"semimajor-axis\",
                      \"year\",
                      \"half-month\",
-                     \"eccentricity\", 
-                     \"inclination\", 
-                     \"serial-number\", 
+                     \"eccentricity\",
+                     \"inclination\",
+                     \"serial-number\",
                      \"vanity-name\") values (?, ?, ?, ?, ?, ?)"
-        minor-planet-number semimajor-axis year half-month eccentricity inclination serial-number vanity-name)) 
-
+        minor-planet-number semimajor-axis year half-month
+        eccentricity inclination serial-number vanity-name))
